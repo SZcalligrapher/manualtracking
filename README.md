@@ -109,9 +109,35 @@ python3 -m http.server 8321
 
 离线手部识别使用 [MediaPipe](https://github.com/google-ai-edge/mediapipe) Tasks Vision 和 Hand Landmarker。第三方文件及许可信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。本项目原创代码采用 MIT License。
 
-## 关于作者
+## About Me
 
-_待补充：作者简介、个人主页和联系方式。_
+Hello，大家好，我是 **SlashZ**，也可以叫我浩安。
+
+我是一个长期在路上的独立开发者、AI 产品折腾者，也是一名内容创作者。平时我会在小红书、B站、抖音、视频号和 YouTube 上分享自己做产品、Vibe Coding、AI Coding、App Store 上架、创作者工具和各种 AI 工作流的实践。
+
+比起只写“我做了什么”，我更喜欢把从 0 到 1 的过程也摊开讲：一个 idea 是怎么冒出来的，怎么用 AI 辅助开发跑出 demo，怎么踩 App Store 审核的坑，怎么把 Prompt、模型 API、前后端和用户体验揉成一个真的能上架、能被用户使用的产品。
+
+目前我主要在做几个自己的产品：
+
+- [呈迹 Achiva](https://apps.apple.com/us/app/achiva-achievement-tracker/id6745219866)：一款把现实经历变成数字成就卡牌的个人成就记录 App。
+- [印所 Printroom](https://apps.apple.com/cn/app/%E5%8D%B0%E6%89%80-ai%E7%85%A7%E7%89%87%E7%94%9F%E6%88%90%E4%B8%8E%E7%9B%B8%E7%BA%B8%E9%A3%8E%E6%A0%BC/id6767815016)：一款“不记提示词”的 AI 生图 App。用户只需要选照片、选风格，剩下交给 GPT-Image-2。
+- [粉视 FansLook](https://www.fanslook.work/)：一个面向创作者的多平台数据追踪与 AI 内容生产工具，试图把“看数据”到“做内容”的过程串成更顺手的工作流。
+
+我关心的东西大概可以总结成一句话：
+
+> 怎么把越来越强的 AI 能力，变成普通人真的愿意用、真的用得起来、真的能持续创造价值的产品。
+
+如果你也对 AI Agent、Vibe Coding、独立开发、创作者工具或者 App Store 上架感兴趣，欢迎来找我玩。
+
+### Find Me
+
+- 小红书：[@SlashZ](https://www.xiaohongshu.com/user/profile/62afe0dc000000001b029905)
+- B站：[@SlashZ斜杠青年Z](https://space.bilibili.com/3546804903741472)
+- 抖音：@SlashZ
+- 微信视频号：SlashZ斜杠青年Z
+- YouTube：@SlashZ
+- X / Twitter：[@CreatorAstrojan](https://x.com/CreatorAstrojan)
+- Email：`slashxyz@qq.com`
 
 ## License
 
