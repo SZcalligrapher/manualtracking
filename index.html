@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111318">
+  <title>Manual Tracking Editor</title>
+  <link rel="stylesheet" href="assets/styles.css?v=20260810-22">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Manual Tracking</h1>
+        <p id="projectStatus">新项目 · 30 fps</p>
+      </div>
+      <div class="top-actions desktop-only">
+        <label class="button primary">打开视频<input id="videoInput" type="file" accept="video/*"></label>
+        <button id="analyzeButton" class="button" type="button" disabled>首次识别全片</button>
+        <label class="button">导入轨迹<input id="trackingInput" type="file" accept="application/json,.json"></label>
+        <button id="exportProjectButton" class="button" type="button">导出工程</button>
+        <button id="saveBrowserProjectButton" class="button" type="button">保存到本机</button>
+        <button id="restoreBrowserProjectButton" class="button" type="button">恢复上次工程</button>
+        <button id="exportVideoButton" class="button" type="button" disabled>导出 MP4</button>
+      </div>
+      <div class="mini-only top-actions">
+        <button id="demoButton" class="button primary" type="button">载入演示</button>
+        <button id="saveLocalButton" class="button" type="button">保存进度</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div class="stage-column">
+        <div id="stageWrap" class="stage-wrap">
+          <canvas id="stage" width="1280" height="720"></canvas>
+          <video id="sourceVideo" playsinline></video>
+          <div id="emptyState" class="empty-state">
+            <span>01</span>
+            <strong>打开一段手势视频</strong>
+            <small>自动识别伸开的指尖，再逐帧拖动修正</small>
+          </div>
+        </div>
+
+        <div class="transport">
+          <button id="prevFrame" type="button" aria-label="上一帧">‹</button>
+          <button id="playButton" class="play" type="button" aria-label="播放" title="播放"></button>
+          <button id="nextFrame" type="button" aria-label="下一帧">›</button>
+          <output id="timecode">00:00:00 / 00:00:00</output>
+          <label class="zoom-control">时间轴
+            <input id="timelineZoom" type="range" min="1" max="8" step="1" value="2">
+          </label>
+        </div>
+      </div>
+
+      <aside class="inspector">
+        <section>
+          <div class="section-title">
+            <h2>本段蒙版手指</h2>
+            <button id="removeFingerSelectionKeyframe" type="button" disabled>删除当前切换</button>
+          </div>
+          <p id="fingerSelectionStatus" class="hint">从第 0 帧开始生效，直到下一个选择关键帧。</p>
+          <div id="fingerSelectionGrid" class="finger-selection-grid"></div>
+          <label class="auto-fill-toggle"><input id="autoFillMissingFingers" type="checkbox"> 自动补齐本段内漏检的生效手指</label>
+          <label class="auto-fill-toggle"><input id="manualCorrectionFollow" type="checkbox" checked> 区间内异常跳点锁定</label>
+          <div class="manual-range-actions">
+            <button id="manualRangeStart" type="button">设为区间起点</button>
+            <button id="manualRangeEnd" type="button" disabled>设为区间终点</button>
+            <button id="removeManualRange" type="button" disabled>删除当前区间</button>
+          </div>
+          <p id="manualRangeStatus" class="hint">当前帧使用自动轨迹；先设置起点和终点后才能拖动标准手指。</p>
+          <label class="field">区间内跳点阈值
+            <select id="manualCorrectionThreshold">
+              <option value="0.02">2%（严格）</option>
+              <option value="0.04" selected>4%（推荐）</option>
+              <option value="0.06">6%</option>
+              <option value="0.10">10%（宽松）</option>
+            </select>
+          </label>
+          <p class="hint">勾选变化会在当前帧自动写入选择关键帧；未勾选的标准手指会从这一时间段直接删除。</p>
+        </section>
+
+        <section class="points-section">
+          <div class="section-title">
+            <h2>当前帧指尖</h2>
+            <button id="addPointButton" type="button">+ 手动点</button>
+          </div>
+          <p class="hint">只保留伸直的手指。标准手指只有在手动修正区间内才能拖动。</p>
+          <div id="pointListViewport" class="point-list-viewport">
+            <div id="pointList" class="point-list"></div>
+            <div id="missingFingerList" class="missing-finger-list"></div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title"><h2>蒙版素材</h2></div>
+          <div class="desktop-only asset-buttons">
+            <label class="button compact">+ 图片<input id="imageOverlayInput" type="file" accept="image/*" multiple></label>
+            <label class="button compact">+ 视频<input id="videoOverlayInput" type="file" accept="video/*" multiple></label>
+          </div>
+          <div id="layerList" class="layer-list"></div>
+          <div class="clip-editor">
+            <strong id="selectedClipName">尚未选择片段</strong>
+            <p id="selectedClipMeta" class="hint">拖动 clip 主体移动；拖动左右边缘修剪</p>
+            <div class="clip-fields">
+              <label class="field">开始帧<input id="clipStartFrame" type="number" min="0" step="1" disabled></label>
+              <label class="field">结束帧<input id="clipEndFrame" type="number" min="0" step="1" disabled></label>
+              <label class="field">素材入点（秒）<input id="clipSourceStart" type="number" min="0" step="0.033" disabled></label>
+              <label class="field">蒙版模式<select id="clipMaskMode" disabled><option value="inside">蒙版内</option><option value="outside">反选（蒙版外）</option></select></label>
+              <label class="field">片段特效<select id="clipEffect" disabled><option value="none">无</option><option value="glitch">故障闪切</option><option value="neon-scan">霓虹扫描</option><option value="shockwave">冲击波</option><option value="dark-focus">暗场聚焦</option><option value="feedback">反馈残影</option><option value="rgb-split">RGB 分离</option><option value="pixel-poster">像素海报</option><option value="liquid-warp">液态扭曲</option><option value="raster-slice">扫描切片</option></select></label>
+              <label class="field clip-field-wide">特效强度<input id="clipEffectIntensity" type="range" min="0.2" max="1" step="0.05" value="0.75" disabled></label>
+            </div>
+            <div class="clip-actions">
+              <button id="clipMoveEarlier" type="button" disabled>前移</button>
+              <button id="clipMoveLater" type="button" disabled>后移</button>
+              <button id="clipCut" type="button" disabled>在播放头切开</button>
+              <button id="clipFitSource" type="button" disabled>恢复完整长度</button>
+              <button id="clipDelete" type="button" disabled>删除</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="desktop-only">
+          <div class="section-title"><h2>识别设置</h2></div>
+          <label class="auto-fill-toggle"><input id="trackingSmoothingEnabled" type="checkbox" checked> 平滑相邻帧的轻微抖动</label>
+          <label class="field">平滑距离阈值
+            <select id="trackingSmoothingThreshold">
+              <option value="0.01">1%（轻微）</option>
+              <option value="0.02" selected>2%（推荐）</option>
+              <option value="0.03">3%（更平滑）</option>
+              <option value="0.04">4%（最强）</option>
+            </select>
+          </label>
+          <p class="hint">只对前后帧距离都小于阈值的自动点取中间值；大动作、跳点、手动锚点和手动跟随不会被平滑。</p>
+          <label class="field">采样帧率
+            <select id="sampleFps">
+              <option value="5">5 fps（快）</option>
+              <option value="10" selected>10 fps（推荐）</option>
+              <option value="15">15 fps（精细）</option>
+              <option value="30">30 fps（高精度，较慢）</option>
+            </select>
+          </label>
+          <div class="recognition-actions">
+            <button id="reanalyzeButton" class="button compact" type="button" disabled>按生效手指重识别全片</button>
+            <button id="detectCurrentFrameButton" class="button compact" type="button" disabled>查找当前帧位置</button>
+          </div>
+          <progress id="analyzeProgress" max="1" value="0"></progress>
+          <p id="analyzeStatus" class="hint">首次识别使用伸直判定；重识别和当前帧查找会直接读取本段生效手指的指尖坐标。</p>
+        </section>
+      </aside>
+    </section>
+
+    <section class="timeline-panel">
+      <div class="timeline-head">
+        <div class="timeline-head-tools"><strong>轨道</strong><button id="splitClipButton" class="timeline-tool-button" type="button" disabled title="在播放头分割片段（S / ⌘B）" aria-label="在播放头分割片段"><span aria-hidden="true">✂</span><span>分割</span><kbd>S</kbd></button></div>
+        <span id="frameReadout">第 0 帧</span>
+      </div>
+      <div id="timelineScroller" class="timeline-scroller">
+        <div id="timeline" class="timeline">
+          <div id="playhead" class="playhead"></div>
+          <div class="track"><span>蒙版内素材</span><div id="maskMediaLane" class="track-lane mask-media-lane"></div></div>
+          <div class="track"><span>外部原视频</span><div class="track-lane"><i class="clip video-clip">原视频</i></div></div>
+          <div class="track"><span>指尖位置</span><div id="keyframeLane" class="track-lane keyframe-lane"></div></div>
+          <div class="track"><span>生效手指</span><div id="fingerSelectionLane" class="track-lane selection-lane"></div></div>
+          <div class="track"><span>手动修正</span><div id="manualCorrectionLane" class="track-lane manual-correction-lane"></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="assets/desktop.js?v=20260810-26"></script>
+</body>
+</html>
