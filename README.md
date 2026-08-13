@@ -27,8 +27,8 @@
 推荐使用最新版 Chrome。项目是纯静态页面，只需要一个本地 HTTP 服务。
 
 ```bash
-git clone https://github.com/SZcalligrapher/manual-tracking-editor.git
-cd manual-tracking-editor
+git clone https://github.com/SZcalligrapher/manualtracking.git
+cd manualtracking
 python3 -m http.server 8321
 ```
 
