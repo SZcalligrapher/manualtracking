@@ -135,7 +135,7 @@ Hello，大家好，我是 **SlashZ**，也可以叫我浩安。
 - B站：[@SlashZ斜杠青年Z](https://space.bilibili.com/3546804903741472)
 - 抖音：@SlashZ
 - 微信视频号：SlashZ斜杠青年Z
-- YouTube：@SlashZ
+- YouTube：[@SlashZ](https://www.youtube.com/@slashz-98)
 - X / Twitter：[@CreatorAstrojan](https://x.com/CreatorAstrojan)
 - Email：`slashxyz@qq.com`
 
