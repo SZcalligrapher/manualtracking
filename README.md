@@ -111,7 +111,7 @@ python3 -m http.server 8321
 
 ## About Me
 
-Hello，大家好，我是 **SlashZ**，也可以叫我浩安。
+Hello，大家好，我是 **SlashZ**，也可以叫我Barney。
 
 我是一个长期在路上的独立开发者、AI 产品折腾者，也是一名内容创作者。平时我会在小红书、B站、抖音、视频号和 YouTube 上分享自己做产品、Vibe Coding、AI Coding、App Store 上架、创作者工具和各种 AI 工作流的实践。
 
